@@ -1,0 +1,32 @@
+{
+  "name": "Plan de Tesis · G7 MDS UPC",
+  "short_name": "Tesis G7",
+  "description": "Planificación de tesis del equipo: calendario, ruta de entrega y bloques de capacitación cruzada.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#312e81",
+  "theme_color": "#312e81",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
