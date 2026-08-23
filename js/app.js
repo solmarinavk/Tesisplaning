@@ -60,8 +60,16 @@ const MILESTONES = [
   { date: "2026-08-24", emoji: "📤", title: "Se comparte el documento al asesor" },
   { date: "2026-08-30", emoji: "📤", title: "Reenvío al asesor (dom 30 o lun 31)" },
   { date: "2026-09-05", emoji: "🔒", title: "Cierre total del documento" },
-  { date: "2026-09-06", emoji: "🎓", title: "ENVÍO DE LA TESIS", final: true },
+  { date: "2026-09-06", emoji: "🎓", title: "ENVÍO DE LA TESIS", final: true,
+    sub: "Fecha límite oficial UPC. Se entrega en Word y PDF + correo de aprobación del asesor (obligatorio). Entregar tarde = pago por reprogramación." },
 ];
+
+// Ventana estimada de sustentación (cronograma oficial UPC: 2ª o 3ª semana de noviembre)
+const SUSTEN = {
+  from: "2026-11-09", to: "2026-11-20",
+  label: "Ventana estimada de sustentación",
+  note: "Según el cronograma UPC: 2ª o 3ª semana de noviembre (puede moverse si hay observaciones). Horarios: L–J 7:30–20:00, V 7:30–13:30.",
+};
 
 // Fase transversal: preparación del PPT (después del bloque 3, hasta el 1 de noviembre)
 const PPT_PHASE = { from: "2026-09-28", to: "2026-11-01", label: "Preparación del PPT de sustentación" };
@@ -203,6 +211,20 @@ const ROUTE = [
   { id: "r10", when: "28 sep – 1 nov", title: "Preparación del PPT", desc: "En paralelo a los bloques, se arma la presentación de sustentación." },
 ];
 
+// Después del envío: proceso oficial UPC (fechas aproximadas)
+const POST_ROUTE = [
+  { id: "p1", when: "≈ 7 – 20 sep", title: "🔍 Revisión 1: Turnitin",
+    desc: "La asistente pasa el documento por Turnitin. Límite máximo de similitud: 20%." },
+  { id: "p2", when: "≈ fines de sep", title: "⚖️ Nombramiento de jurados",
+    desc: "El director asigna los jurados. Son anónimos para el grupo." },
+  { id: "p3", when: "≈ oct (2–3 semanas)", title: "📝 Observaciones del jurado",
+    desc: "Si hay observaciones, avisan por correo: se levantan con el asesor y se entrega la versión final." },
+  { id: "p4", when: "≈ oct – nov (2 semanas)", title: "📐 Revisión 2: Turnitin + APA (DGC)",
+    desc: "Revisión de forma con la plantilla oficial. Es indispensable levantar las observaciones para continuar." },
+  { id: "p5", when: "9 – 20 nov (estimado)", title: "🎯 SUSTENTACIÓN", milestone: true,
+    desc: "2ª o 3ª semana de noviembre. Si el grupo termina antes, puede sustentar antes." },
+];
+
 const SEND_DATE = "2026-09-06";
 
 /* ---------- Estado local (localStorage) ---------- */
@@ -235,6 +257,9 @@ function milestonesFor(dateStr) {
 }
 function inPpt(dateStr) {
   return inRange(dateStr, PPT_PHASE.from, PPT_PHASE.to);
+}
+function inSusten(dateStr) {
+  return inRange(dateStr, SUSTEN.from, SUSTEN.to);
 }
 
 /* ---------- Render: calendario ---------- */
@@ -306,6 +331,8 @@ function buildDay(dateStr, dayNum, today) {
     btn.appendChild(chip);
   } else if (phase) {
     btn.classList.add("p-tesis");
+  } else if (inSusten(dateStr)) {
+    btn.classList.add("p-susten");
   } else if (inPpt(dateStr)) {
     btn.classList.add("p-ppt");
   }
@@ -372,6 +399,16 @@ function buildHero() {
     cd.appendChild(pill("count-done", "🏆", "Los 6 bloques están completos"));
   }
 
+  // sustentación (solo cuando la tesis ya se envió)
+  if (today > SEND_DATE) {
+    if (inSusten(today)) {
+      cd.appendChild(pill("count-envio", "🎯", "¡Semanas de sustentación! (9 – 20 nov)"));
+    } else if (today < SUSTEN.from) {
+      const ds = daysBetween(today, SUSTEN.from);
+      cd.appendChild(pill("count-envio", ds, `día${ds === 1 ? "" : "s"} para la ventana de sustentación (9 – 20 nov)`));
+    }
+  }
+
   // fase actual
   const ph = document.getElementById("hero-phase");
   const phase = phaseFor(today);
@@ -390,6 +427,9 @@ function buildHero() {
   } else if (phase) {
     ph.innerHTML = `<strong>📍 Etapa actual: ${phase.label}</strong>
       <span class="phase-note">${phase.note}</span>`;
+  } else if (inSusten(today)) {
+    ph.innerHTML = `<strong>🎯 ${SUSTEN.label}</strong>
+      <span class="phase-note">${SUSTEN.note}</span>`;
   } else if (inPpt(today)) {
     ph.innerHTML = `<strong>📍 Etapa actual: ${PPT_PHASE.label}</strong>
       <span class="phase-note">En paralelo a los bloques de los fines de semana.</span>`;
@@ -410,9 +450,14 @@ function pill(cls, num, lbl) {
 /* ---------- Render: timeline / ruta ---------- */
 
 function buildTimeline() {
-  const ol = document.getElementById("timeline");
+  buildChecklist("timeline", ROUTE);
+  buildChecklist("timeline-post", POST_ROUTE);
+}
+
+function buildChecklist(elId, steps) {
+  const ol = document.getElementById(elId);
   ol.innerHTML = "";
-  for (const step of ROUTE) {
+  for (const step of steps) {
     const li = document.createElement("li");
     li.className = "tl-item" + (step.milestone ? " milestone" : "") + (state.route[step.id] ? " done" : "");
     li.innerHTML = `
@@ -487,7 +532,7 @@ function openSheet(dateStr) {
   const events = [];
 
   for (const m of milestonesFor(dateStr)) {
-    events.push({ cls: "ev-hito", html: `${m.emoji} ${m.title}` });
+    events.push({ cls: "ev-hito", html: `${m.emoji} ${m.title}${m.sub ? `<div class="ev-sub">${m.sub}</div>` : ""}` });
   }
   const session = sessionFor(dateStr);
   if (session) {
@@ -508,6 +553,9 @@ function openSheet(dateStr) {
   }
   if (!session && !phase && inPpt(dateStr)) {
     events.push({ cls: "ev-ppt", html: `🖥️ ${PPT_PHASE.label}` });
+  }
+  if (inSusten(dateStr)) {
+    events.push({ cls: "ev-susten", html: `🎯 ${SUSTEN.label} <div class="ev-sub">${SUSTEN.note}</div>` });
   }
 
   if (events.length === 0) {

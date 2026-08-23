@@ -11,6 +11,9 @@ cruzada de los 6 bloques (septiembre – noviembre).
   tesis / PPT / hitos).
 - 🛤️ **Ruta hasta el envío**: checklist de etapas (envío al asesor, rondas de
   feedback, correcciones, cierre y envío final).
+- 🎯 **Después del envío**: proceso oficial UPC (Turnitin ≤20%, jurados,
+  observaciones, revisión APA) y la ventana estimada de sustentación
+  (2ª–3ª semana de noviembre) marcada en el calendario.
 - 🗣️ **Bloques de capacitación cruzada**: quién expone cada fin de semana, con
   el argumento central, los puntos obligatorios y las 3 preguntas de
   sustentación de cada bloque.
