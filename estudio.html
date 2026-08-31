@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Tarjetas de estudio · Tesis G7</title>
+  <meta name="theme-color" content="#312e81" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <a class="back-link" href="index.html" aria-label="Volver al plan">←</a>
+      <div>
+        <h1>Tarjetas de estudio</h1>
+        <p class="brand-sub">219 preguntas de sustentación</p>
+      </div>
+    </div>
+    <nav class="quick-nav">
+      <a href="index.html">🎓 Plan</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- PROGRESO + REPASAR -->
+  <section class="hero">
+    <div class="hero-card">
+      <div class="study-progress">
+        <div class="sp-nums"><span id="sp-dom">0</span><span class="sp-total" id="sp-total">/ 219 dominadas</span></div>
+        <div class="sp-bar"><div class="sp-fill" id="sp-fill"></div></div>
+        <p class="sp-today" id="sp-today">—</p>
+      </div>
+      <button class="btn btn-study" id="btn-study">▶ Repasar</button>
+      <p class="study-hint">Sesiones cortas de hasta 12 tarjetas. Lee la pregunta, <strong>responde en voz alta</strong> y recién ahí mira la respuesta. Las que falles vuelven pronto; las que sepas se espacian solas.</p>
+    </div>
+  </section>
+
+  <!-- FILTROS -->
+  <section class="section">
+    <h2 class="section-title">🃏 Mazos</h2>
+    <p class="section-sub">Elige qué repasar. <strong>🔴 Críticas</strong> son las 22 más probables y peligrosas: si el tiempo no alcanza, prepara esas.</p>
+    <div class="chips" id="chips"><!-- JS --></div>
+  </section>
+
+  <!-- ESTRATEGIA -->
+  <section class="section">
+    <div class="strategy-card">
+      <details>
+        <summary>🧭 Estrategia de defensa (leer una vez, aplicar siempre)</summary>
+        <div class="strategy-body">
+          <p><strong>La regla de oro:</strong> cuando no sepan algo, díganlo. La mayor fortaleza del trabajo es la honestidad metodológica; improvisar una respuesta débil la destruye. Frase de rescate: <em>«No lo verificamos y no puedo afirmarlo con los datos que tenemos; lo que sí puedo decir es…»</em></p>
+          <p><strong>Estructura de toda respuesta:</strong> ① responder directo en una frase → ② dar el dato o la cifra que lo sostiene → ③ reconocer el límite declarado y volver a la contribución real.</p>
+          <p><strong>Tres frases que conviene tener listas:</strong></p>
+          <ul>
+            <li>«No lo verificamos y no puedo afirmarlo con los datos que tenemos.»</li>
+            <li>«Eso está declarado como limitación en la sección…»</li>
+            <li>«La cifra exacta es… y sale de…»</li>
+          </ul>
+          <p><strong>Un error a evitar:</strong> defender el 31.5% como si fuera un buen resultado en términos absolutos. La defensa correcta es qué significa ese número por encima del azar y qué lo limita.</p>
+          <p><strong>En la sala:</strong> un integrante responde el núcleo y otro complementa solo si agrega valor. Eviten responder de a tres.</p>
+          <p><strong>Guion de cierre (60 segundos):</strong></p>
+          <p class="cierre" id="cierre-text"></p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- EXPLORAR -->
+  <section class="section">
+    <h2 class="section-title">📚 Ver todas las tarjetas</h2>
+    <p class="section-sub">Para leer de corrido antes de empezar a repasar. El punto de color muestra tu progreso: <span class="st-dot st-new"></span> nueva · <span class="st-dot st-learn"></span> aprendiendo · <span class="st-dot st-dom"></span> dominada.</p>
+    <div id="browse"><!-- JS --></div>
+  </section>
+
+  <footer class="footer">
+    <p>💾 Tu progreso se guarda en <strong>este dispositivo</strong>.</p>
+    <p><button class="linklike danger" id="btn-reset-cards">Reiniciar mi progreso de tarjetas</button></p>
+  </footer>
+</main>
+
+<!-- SESIÓN DE ESTUDIO (overlay) -->
+<div class="study-overlay hidden" id="study-overlay">
+  <div class="study-top">
+    <span id="st-count">1 / 12</span>
+    <div class="st-bar"><div class="st-bar-fill" id="st-bar-fill"></div></div>
+    <button class="st-close" id="st-close" aria-label="Salir">✕</button>
+  </div>
+
+  <div class="study-card" id="study-card">
+    <div class="sc-meta" id="sc-meta"></div>
+    <div class="sc-question" id="sc-question"></div>
+    <div class="sc-answer hidden" id="sc-answer"></div>
+  </div>
+
+  <div class="study-actions">
+    <button class="btn btn-reveal" id="btn-reveal">Mostrar respuesta</button>
+    <div class="grade-row hidden" id="grade-row">
+      <button class="btn btn-fail" id="btn-fail">😅 Aún no</button>
+      <button class="btn btn-ok" id="btn-ok">✅ La supe</button>
+    </div>
+  </div>
+
+  <div class="study-done hidden" id="study-done">
+    <div class="sd-emoji">🎉</div>
+    <h3>¡Sesión completada!</h3>
+    <p id="sd-summary"></p>
+    <button class="btn btn-study" id="btn-again">▶ Otra sesión</button>
+    <button class="btn btn-exit" id="btn-exit">Volver</button>
+  </div>
+</div>
+
+<script src="js/cards-data.js"></script>
+<script src="js/estudio.js"></script>
+</body>
+</html>

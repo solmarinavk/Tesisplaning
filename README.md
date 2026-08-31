@@ -1,6 +1,6 @@
 # 🎓 Plan de Tesis · G7 — Maestría en Data Science UPC
 
-PWA sencilla para el equipo (Sol, Michel y Jhely). Dos cosas nada más:
+PWA sencilla para el equipo (Sol, Michel y Jhely). Tres cosas:
 
 1. **✅ Lo que vamos logrando** — un registro de avances. Se escribe qué se
    logró, se elige la fecha y se agrega. Los días con avance quedan marcados
@@ -9,6 +9,11 @@ PWA sencilla para el equipo (Sol, Michel y Jhely). Dos cosas nada más:
    cruzada (un bloque por fin de semana, de septiembre a noviembre) y el
    contenido de cada bloque: argumento central, puntos obligatorios y las
    3 preguntas de sustentación.
+3. **🃏 Tarjetas de estudio** (`estudio.html`) — 219 preguntas de sustentación
+   en 10 mazos por perfil de jurado, con repaso activo + espaciado (Leitner):
+   lees la pregunta, respondes en voz alta, destapas la respuesta y marcas si
+   la supiste. Las falladas vuelven pronto; las sabidas se espacian (1→3→7→14
+   días). Las 22 marcadas 🔴 son las más probables y se estudian primero.
 
 Además: accesos directos al documento de tesis y a la carpeta compartida, y
 un contador de días para el próximo bloque.
@@ -31,6 +36,9 @@ Sitio 100% estático, no hay build.
 index.html            Página principal
 css/styles.css        Estilos (mobile-first)
 js/app.js             Plan de estudio + calendario + avances
+estudio.html          Tarjetas de estudio
+js/cards-data.js      Banco de 219 tarjetas (generado de los docs de preparación)
+js/estudio.js         Repaso espaciado (Leitner) y exploración de mazos
 manifest.webmanifest  Manifiesto PWA
 sw.js                 Service worker (offline)
 icons/                Íconos de la app
