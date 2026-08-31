@@ -44,14 +44,12 @@ const PEOPLE = {
   jhely:  { name: "Jhely",  cls: "jhely" },
 };
 
-// Cada fin de semana: un bloque (o PPT si no expone nadie)
+// Cada fin de semana de exposición: un bloque
 const SESSIONS = [
   { days: ["2026-09-12", "2026-09-13"], block: 1, who: "michel" },
   { days: ["2026-09-19", "2026-09-20"], block: 2, who: "sol" },
   { days: ["2026-09-26", "2026-09-27"], block: 3, who: "jhely" },
-  { days: ["2026-10-03", "2026-10-04"], block: 0 },
   { days: ["2026-10-10", "2026-10-11"], block: 4, who: "michel" },
-  { days: ["2026-10-17", "2026-10-18"], block: 0 },
   { days: ["2026-10-24", "2026-10-25"], block: 5, who: "jhely" },
   { days: ["2026-10-31", "2026-11-01"], block: 6, who: "sol" },
 ];
@@ -370,31 +368,18 @@ function buildDay(dateStr, dayNum, today) {
   el.appendChild(num);
 
   if (session) {
-    if (session.block > 0) {
-      el.classList.add(`p-${session.who}`);
-      const chip = document.createElement("span");
-      chip.className = `chip chip-${session.who}`;
-      chip.textContent = state.blocks[session.block] ? "✓" : "B" + session.block;
-      el.appendChild(chip);
-      if (state.blocks[session.block]) el.classList.add("block-done");
-      el.title = `Bloque ${session.block} — expone ${PEOPLE[session.who].name}`;
-    } else {
-      el.classList.add("p-ppt");
-      const chip = document.createElement("span");
-      chip.className = "chip chip-ppt";
-      chip.textContent = "PPT";
-      el.appendChild(chip);
-      el.title = "Fin de semana para avanzar el PPT";
-    }
+    el.classList.add(`p-${session.who}`);
+    const chip = document.createElement("span");
+    chip.className = `chip chip-${session.who}`;
+    chip.textContent = state.blocks[session.block] ? "✓" : "B" + session.block;
+    el.appendChild(chip);
+    if (state.blocks[session.block]) el.classList.add("block-done");
+    el.title = `Bloque ${session.block} — expone ${PEOPLE[session.who].name}`;
     el.addEventListener("click", () => {
-      const target = session.block > 0
-        ? document.getElementById("bloque-" + session.block)
-        : document.getElementById("bloques");
+      const target = document.getElementById("bloque-" + session.block);
       target.scrollIntoView({ behavior: "smooth", block: "center" });
-      if (session.block > 0) {
-        target.classList.add("flash");
-        setTimeout(() => target.classList.remove("flash"), 1200);
-      }
+      target.classList.add("flash");
+      setTimeout(() => target.classList.remove("flash"), 1200);
     });
   }
 
