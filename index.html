@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Plan de Tesis · G7</title>
-  <meta name="description" content="Planificación de tesis — Maestría en Data Science UPC. Calendario, ruta de entrega y bloques de capacitación cruzada." />
+  <meta name="description" content="Plan de estudio del equipo — Maestría en Data Science UPC. Calendario de bloques y registro de avances." />
   <meta name="theme-color" content="#312e81" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
@@ -27,8 +27,8 @@
       </div>
     </div>
     <nav class="quick-nav">
+      <a href="#avances">Avances</a>
       <a href="#calendario">Calendario</a>
-      <a href="#ruta">Ruta</a>
       <a href="#bloques">Bloques</a>
     </nav>
   </div>
@@ -36,133 +36,87 @@
 
 <main>
 
-  <!-- HERO / HOY -->
-  <section class="hero" id="hoy">
+  <!-- PORTADA -->
+  <section class="hero">
     <div class="hero-card">
-      <div class="hero-today">
-        <p class="hero-label">Hoy es</p>
-        <p class="hero-date" id="hero-date">—</p>
-      </div>
-      <div class="hero-countdown" id="hero-countdown">
-        <!-- se llena por JS -->
-      </div>
-      <div class="hero-phase" id="hero-phase">
-        <!-- fase actual por JS -->
-      </div>
+      <p class="hero-label">Hoy es</p>
+      <p class="hero-date" id="hero-date">—</p>
+
+      <div class="hero-pills" id="hero-pills"><!-- JS --></div>
+
       <div class="hero-actions">
         <a class="btn btn-doc" target="_blank" rel="noopener"
            href="https://upcedupe-my.sharepoint.com/:w:/g/personal/e202411058_upc_edu_pe/IQDRNMA9AV5sQaZxkCQ2ro44AdvdgoTfrQjGai8BATHbYuw?e=8x37Rl">
-          📄 Documento de tesis
+          📄 Documento
         </a>
         <a class="btn btn-folder" target="_blank" rel="noopener"
            href="https://upcedupe-my.sharepoint.com/:f:/g/personal/e202411058_upc_edu_pe/IgCr6ckTygm-SajQEywB1_AHAR40iPiZxzMHCmifpr9KDxs?e=idbEZw">
-          📁 Carpeta completa
+          📁 Carpeta
         </a>
         <button class="btn btn-install hidden" id="btn-install">📲 Instalar app</button>
       </div>
     </div>
   </section>
 
-  <!-- LEYENDA -->
-  <section class="legend-wrap">
-    <div class="legend">
-      <span class="lg-item"><i class="dot dot-michel"></i> Michel</span>
-      <span class="lg-item"><i class="dot dot-sol"></i> Sol</span>
-      <span class="lg-item"><i class="dot dot-jhely"></i> Jhely</span>
-      <span class="lg-item"><i class="dot dot-tesis"></i> Ruta de tesis</span>
-      <span class="lg-item"><i class="dot dot-ppt"></i> PPT</span>
-      <span class="lg-item"><i class="dot dot-hito"></i> Hito clave</span>
-      <span class="lg-item"><i class="dot dot-susten"></i> Sustentación (est.)</span>
+  <!-- AVANCES -->
+  <section id="avances" class="section">
+    <h2 class="section-title">✅ Lo que vamos logrando</h2>
+    <p class="section-sub">Anota aquí cada avance: feedback recibido, correcciones hechas, lo que sea.</p>
+
+    <div class="add-card">
+      <input type="text" id="av-text" placeholder="¿Qué se logró?" autocomplete="off" />
+      <div class="add-row">
+        <input type="date" id="av-date" />
+        <button class="btn btn-add" id="av-add">+ Agregar</button>
+      </div>
     </div>
-    <p class="legend-hint">Toca cualquier día para marcar avances, feedback o dejar una nota ✍️</p>
+
+    <ul class="avances" id="avances-list"><!-- JS --></ul>
   </section>
 
   <!-- CALENDARIO -->
   <section id="calendario" class="section">
-    <h2 class="section-title">📆 Calendario</h2>
-    <div class="months" id="months"><!-- meses por JS --></div>
-  </section>
+    <h2 class="section-title">📆 Plan de estudio</h2>
+    <p class="section-sub">Un bloque por fin de semana. Toca un bloque para ver de qué se trata.</p>
 
-  <!-- RUTA DE LA TESIS -->
-  <section id="ruta" class="section">
-    <h2 class="section-title">🛤️ Ruta hasta el envío <span class="title-tag">6 sep</span></h2>
-    <p class="section-sub">Marca cada etapa cuando esté completada.</p>
-    <ol class="timeline" id="timeline"><!-- etapas por JS --></ol>
-  </section>
-
-  <!-- DESPUÉS DEL ENVÍO (cronograma oficial UPC) -->
-  <section id="despues" class="section">
-    <h2 class="section-title">🎯 Después del envío <span class="title-tag title-tag-gold">9 – 20 nov</span></h2>
-    <p class="section-sub">Proceso oficial de la UPC tras entregar la tesis. Las fechas son aproximadas — la sustentación sería la <strong>2ª o 3ª semana de noviembre</strong>.</p>
-
-    <div class="keys-card">
-      <h3>⚡ No olvidar</h3>
-      <ul>
-        <li>📎 El 6 de sep se entrega en <strong>Word y PDF</strong> + <strong>correo de aprobación del asesor</strong> (obligatorio).</li>
-        <li>🔍 Turnitin: máximo <strong>20% de similitud</strong>.</li>
-        <li>📐 Usar la <strong>plantilla oficial de redacción</strong> (APA) — la revisan antes de sustentar.</li>
-        <li>🏢 <strong>No usar nombres reales</strong> de empresas o personas sin autorización escrita (va como anexo).</li>
-        <li>⏩ Si el grupo termina antes, puede <strong>sustentar antes</strong>.</li>
-      </ul>
+    <div class="legend">
+      <span class="lg-item"><i class="dot dot-michel"></i> Michel</span>
+      <span class="lg-item"><i class="dot dot-sol"></i> Sol</span>
+      <span class="lg-item"><i class="dot dot-jhely"></i> Jhely</span>
+      <span class="lg-item"><i class="dot dot-ppt"></i> PPT</span>
     </div>
 
-    <ol class="timeline" id="timeline-post"><!-- etapas por JS --></ol>
+    <div class="months" id="months"><!-- JS --></div>
   </section>
 
-  <!-- SUSTENTACIÓN / BLOQUES -->
+  <!-- BLOQUES -->
   <section id="bloques" class="section">
-    <h2 class="section-title">🗣️ Capacitación cruzada <span class="title-tag">sep – nov</span></h2>
-    <p class="section-sub">Cada fin de semana un integrante expone su bloque. El objetivo: que los tres puedan defender <strong>cualquier</strong> sección de la tesis.</p>
-
-    <div class="blocks" id="blocks"><!-- bloques por JS --></div>
-
-    <div class="format-card closing-card">
-      <h3>🏁 Cierre del ejercicio</h3>
-      <p>Al terminar los seis bloques: ronda final de 30 minutos donde cada integrante responde 3 preguntas al azar de bloques que <em>no</em> dictó. Esa ronda revela si el ejercicio funcionó.</p>
-    </div>
+    <h2 class="section-title">🗣️ Los 6 bloques</h2>
+    <p class="section-sub">Marca el bloque cuando ya se haya expuesto.</p>
+    <div class="blocks" id="blocks"><!-- JS --></div>
   </section>
 
   <footer class="footer">
-    <p>💾 Tus marcas y notas se guardan en <strong>este dispositivo</strong> — no necesitas cuenta.</p>
+    <p>💾 Todo se guarda en <strong>este dispositivo</strong> — sin cuentas ni contraseñas.</p>
     <p><button class="linklike" id="btn-ios-help">¿Cómo instalar la app en el celular?</button></p>
-    <p><button class="linklike danger" id="btn-reset">Borrar todas mis marcas</button></p>
+    <p><button class="linklike danger" id="btn-reset">Borrar todo lo guardado</button></p>
   </footer>
 </main>
 
-<!-- MODAL DE DÍA -->
-<div class="sheet-backdrop hidden" id="sheet-backdrop"></div>
-<div class="sheet hidden" id="sheet" role="dialog" aria-modal="true">
-  <div class="sheet-handle"></div>
-  <h3 id="sheet-date">—</h3>
-  <div id="sheet-events" class="sheet-events"></div>
-  <p class="sheet-label">Marcar este día:</p>
-  <div class="marker-row" id="marker-row">
-    <button data-marker="hecho" class="marker">✅<span>Hecho</span></button>
-    <button data-marker="enviado" class="marker">📤<span>Enviado</span></button>
-    <button data-marker="feedback" class="marker">📩<span>Feedback</span></button>
-    <button data-marker="ojo" class="marker">⚠️<span>Ojo</span></button>
-    <button data-marker="" class="marker marker-clear">✖<span>Quitar</span></button>
-  </div>
-  <p class="sheet-label">Nota del día:</p>
-  <textarea id="sheet-note" rows="2" placeholder="Ej.: El asesor devolvió feedback del cap. 4…"></textarea>
-  <button class="btn btn-close" id="sheet-close">Listo</button>
-</div>
-
-<!-- MODAL INSTRUCCIONES iOS -->
+<!-- INSTALAR -->
 <div class="sheet-backdrop hidden" id="ios-backdrop"></div>
 <div class="sheet hidden" id="ios-sheet" role="dialog" aria-modal="true">
   <div class="sheet-handle"></div>
   <h3>📲 Instalar como app</h3>
   <div class="ios-steps">
-    <p><strong>iPhone / iPad (Safari):</strong></p>
+    <p><strong>iPhone (Safari):</strong></p>
     <ol>
-      <li>Toca el botón <strong>Compartir</strong> <span class="ios-share">⎋</span> (cuadrado con flecha).</li>
+      <li>Toca el botón <strong>Compartir</strong> (cuadrado con flecha ↑).</li>
       <li>Elige <strong>“Añadir a pantalla de inicio”</strong>.</li>
-      <li>Confirma con <strong>“Añadir”</strong>. ¡Listo! Aparece como app.</li>
     </ol>
     <p><strong>Android (Chrome):</strong></p>
     <ol>
-      <li>Toca el menú <strong>⋮</strong> y elige <strong>“Instalar app”</strong> o <strong>“Añadir a pantalla de inicio”</strong>.</li>
+      <li>Toca el menú <strong>⋮</strong> → <strong>“Instalar app”</strong>.</li>
     </ol>
   </div>
   <button class="btn btn-close" id="ios-close">Entendido</button>
