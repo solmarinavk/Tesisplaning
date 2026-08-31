@@ -182,19 +182,24 @@ function showCard() {
   document.getElementById("sc-question").textContent = c.q;
 
   scAnswer.innerHTML = "";
-  for (const para of c.a.split("\n\n")) {
-    const p = document.createElement("p");
-    p.textContent = para;
-    scAnswer.appendChild(p);
-  }
+  // primero lo esencial (contra eso te autocalificas), después la respuesta completa
   if (c.idea) {
     const box = document.createElement("div");
     box.className = "sc-idea";
     const t = document.createElement("strong");
-    t.textContent = "💡 Idea que debe quedar: ";
+    t.textContent = "💡 Lo esencial: ";
     box.appendChild(t);
     box.appendChild(document.createTextNode(c.idea));
     scAnswer.appendChild(box);
+    const lbl = document.createElement("p");
+    lbl.className = "sc-full-label";
+    lbl.textContent = "Respuesta completa (para decir en voz alta):";
+    scAnswer.appendChild(lbl);
+  }
+  for (const para of c.a.split("\n\n")) {
+    const p = document.createElement("p");
+    p.textContent = para;
+    scAnswer.appendChild(p);
   }
   scAnswer.classList.add("hidden");
   gradeRow.classList.add("hidden");
@@ -301,11 +306,6 @@ function buildBrowseList(deckId) {
     item.appendChild(s);
     const body = document.createElement("div");
     body.className = "browse-answer";
-    for (const para of c.a.split("\n\n")) {
-      const p = document.createElement("p");
-      p.textContent = para;
-      body.appendChild(p);
-    }
     if (c.idea) {
       const box = document.createElement("div");
       box.className = "sc-idea";
@@ -314,6 +314,11 @@ function buildBrowseList(deckId) {
       box.appendChild(t);
       box.appendChild(document.createTextNode(c.idea));
       body.appendChild(box);
+    }
+    for (const para of c.a.split("\n\n")) {
+      const p = document.createElement("p");
+      p.textContent = para;
+      body.appendChild(p);
     }
     item.appendChild(body);
     list.appendChild(item);

@@ -120,7 +120,7 @@ const BLOCKS = [
       "El sesgo de asignación al evento más próximo: nueve eventos con 199 a 479 observaciones que desaparecían; detectado dos veces.",
       "La confusión de identidad de dispositivo: recall inicial de 72.22% y por qué activó sospecha en lugar de celebración.",
       "La prueba sintética: 35% de recall sin señal real, cuando lo esperable era 5%.",
-      "El sesgo de comparaciones múltiples: 1 − 0.95²⁹ da 77.6% frente al 81.48% observado. La coincidencia es el argumento.",
+      "El sesgo de comparaciones múltiples: 1 − 0.95²⁹ da 77.4% frente al 81.48% observado. La coincidencia es el argumento.",
     ],
     questions: [
       "¿Cómo supo que el 72.22% estaba mal?",

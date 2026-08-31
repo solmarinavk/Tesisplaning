@@ -71,6 +71,38 @@
     </div>
   </section>
 
+  <!-- CHULETA -->
+  <section class="section">
+    <div class="strategy-card">
+      <details>
+        <summary>📋 Chuleta de cifras (verificada contra la tesis)</summary>
+        <div class="strategy-body">
+          <div class="table-scroll"><table class="cheat-table">
+            <tr><td>Registros GPS</td><td><strong>61,273,298</strong> · 888 dispositivos</td></tr>
+            <tr><td>Turnos</td><td><strong>106,699</strong> · mediana 11.98 h (de 16,054 brutos con máx. 161 días)</td></tr>
+            <tr><td>Ventanas normales</td><td><strong>3,884,561</strong></td></tr>
+            <tr><td>Eventos</td><td><strong>2,447</strong> corporativos → <strong>301</strong> en rango → <strong>54</strong> con GPS (41 turnos, 0.038%)</td></tr>
+            <tr><td>Calidad del dato</td><td>coordenadas centinela <strong>10.52%</strong> · saltos hasta 15,450 km (0.03%) · 33.9% multiubicación</td></tr>
+            <tr><td>Pipeline</td><td>chequeos <strong>41/41</strong> y <strong>30/30</strong> · 13 defectos corregidos</td></tr>
+            <tr><td>Instrumento</td><td><strong>7</strong> expertos · <strong>14</strong> variables → <strong>3</strong> construibles + 1 parcial</td></tr>
+            <tr><td>V de Aiken</td><td>pertinencia: 11 superan azar, 4 sólidas · claridad: 14 y 9</td></tr>
+            <tr><td>Sesgos corregidos</td><td><strong>5</strong> · comparaciones múltiples: <strong>77.4%</strong> por azar vs 81.48% observado</td></tr>
+            <tr><td>Ensamble de semillas</td><td>recall en P99.9 sube de <strong>5.6%</strong> a <strong>31.5%</strong> (10 inicializaciones)</td></tr>
+            <tr><td>p empírico</td><td>árboles <strong>0.032</strong> (30 rep.) · recurrente 0.091 (10 rep., indicativo)</td></tr>
+            <tr><td>Régimen temporal</td><td><strong>51/54</strong> dentro de ±15 min (94.4%) · 3 anticipadas, mediana 33.4 min</td></tr>
+          </table></div>
+          <p><strong>Resultado final por umbral</strong> (recall · alertas/día):</p>
+          <div class="table-scroll"><table class="cheat-table">
+            <tr><th></th><th>Recurrente</th><th>Árboles</th></tr>
+            <tr><td>P95</td><td>38.9% · 670</td><td>48.1% · 492</td></tr>
+            <tr><td><strong>P99.9</strong></td><td><strong>31.5%</strong> (IC 20.4–44.4) · <strong>16.9</strong></td><td><strong>38.9%</strong> (IC 25.9–51.9) · <strong>15.9</strong></td></tr>
+          </table></div>
+          <p class="cheat-note">P99.9 es el único umbral operativamente viable. La cifra exacta siempre gana a la aproximada: «La cifra exacta es… y sale de…».</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
   <!-- EXPLORAR -->
   <section class="section">
     <h2 class="section-title">📚 Ver todas las tarjetas</h2>
