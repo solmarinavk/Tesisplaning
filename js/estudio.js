@@ -10,6 +10,7 @@ const DECKS = CARDS_DATA.decks;
 const CARDS = CARDS_DATA.cards;
 const BOX_DAYS = [0, 1, 3, 7, 14];
 const SESSION_SIZE = 12;
+const MAX_NEW_PER_DAY = 12;   // ritmo sostenible: en ~3 semanas se ven las 219 y quedan 7+ de consolidación
 
 /* ---------- Fechas ---------- */
 function ymd(d) {
@@ -21,9 +22,27 @@ function addDays(s, n) {
   return ymd(new Date(y, m - 1, d + n));
 }
 
+function newAllowedToday() {
+  const t = todayStr();
+  const used = (state.intro && state.intro.d === t) ? state.intro.n : 0;
+  return Math.max(0, MAX_NEW_PER_DAY - used);
+}
+function countNewIntro() {
+  const t = todayStr();
+  if (!state.intro || state.intro.d !== t) state.intro = { d: t, n: 0 };
+  state.intro.n++;
+}
+function touchStreak() {
+  const t = todayStr();
+  if (state.streak && state.streak.last === t) return;
+  const yesterday = addDays(t, -1);
+  const n = (state.streak && state.streak.last === yesterday) ? state.streak.n + 1 : 1;
+  state.streak = { last: t, n };
+}
+
 /* ---------- Estado ---------- */
 const STORE_KEY = "tesis-cards-g7-v1";
-let state = { p: {}, filter: "all" };   // p: { cardId: { b: caja, due: fecha } }
+let state = { p: {}, filter: "all", intro: null, streak: null };   // p: { cardId: { b: caja, due: fecha } }
 try {
   const raw = localStorage.getItem(STORE_KEY);
   if (raw) state = Object.assign(state, JSON.parse(raw));
@@ -46,11 +65,15 @@ function filteredCards() {
 
 function buildQueue() {
   const pool = filteredCards();
-  const due = pool.filter(isDue).sort((a, b) => cardState(a).due < cardState(b).due ? -1 : 1);
+  // repasos vencidos: los más antiguos primero, mezclando mazos dentro del mismo día
+  const due = pool.filter(isDue)
+    .map(c => ({ c, k: cardState(c).due + Math.random() }))
+    .sort((a, b) => a.k < b.k ? -1 : 1)
+    .map(x => x.c);
   const news = pool.filter(isNew);
-  const critNews = news.filter(c => c.crit);
-  const restNews = news.filter(c => !c.crit);
-  return due.concat(critNews, restNews).slice(0, SESSION_SIZE);
+  const orderedNews = news.filter(c => c.crit).concat(news.filter(c => !c.crit));
+  const allowedNews = orderedNews.slice(0, newAllowedToday());
+  return due.concat(allowedNews).slice(0, SESSION_SIZE);
 }
 
 /* ---------- Cabecera de progreso ---------- */
@@ -69,11 +92,15 @@ function refreshTop() {
   document.getElementById("sp-fill").style.width = pool.length ? (100 * dom / pool.length) + "%" : "0%";
 
   const due = pool.filter(isDue).length;
-  const news = pool.filter(isNew).length;
+  const news = Math.min(pool.filter(isNew).length, newAllowedToday());
   const parts = [];
-  if (due) parts.push(`${due} por repasar hoy`);
+  if (due) parts.push(`${due} por repasar`);
   if (news) parts.push(`${news} nuevas`);
-  document.getElementById("sp-today").textContent = parts.length ? "Para hoy: " + parts.join(" · ") : "🏆 Nada pendiente por hoy. ¡Vuelve mañana!";
+  let msg = parts.length ? "Para hoy: " + parts.join(" · ") : "🏆 Listo por hoy. Mañana hay más.";
+  if (state.streak && state.streak.n >= 2 && state.streak.last === todayStr()) {
+    msg += ` · 🔥 ${state.streak.n} días seguidos`;
+  }
+  document.getElementById("sp-today").textContent = msg;
 
   const n = buildQueue().length;
   const btn = document.getElementById("btn-study");
@@ -99,14 +126,13 @@ function buildChips() {
       save();
       buildChips();
       refreshTop();
-      buildBrowse();
     });
     wrap.appendChild(btn);
   }
 }
 
 /* ---------- Sesión de estudio ---------- */
-let queue = [], idx = 0, okCount = 0, failCount = 0, sessionTotal = 0;
+let queue = [], idx = 0, okCount = 0, failCount = 0;
 const requeued = new Set();
 
 const overlay = document.getElementById("study-overlay");
@@ -118,7 +144,6 @@ function startSession() {
   queue = buildQueue();
   if (!queue.length) return;
   idx = 0; okCount = 0; failCount = 0; requeued.clear();
-  sessionTotal = queue.length;
   document.getElementById("study-done").classList.add("hidden");
   document.getElementById("study-card").classList.remove("hidden");
   document.querySelector(".study-actions").classList.remove("hidden");
@@ -131,7 +156,8 @@ function deckOf(c) { return DECKS.find(d => d.id === c.deck); }
 
 function showCard() {
   const c = queue[idx];
-  document.getElementById("st-count").textContent = `${Math.min(idx + 1, sessionTotal)} / ${sessionTotal}`;
+  const left = queue.length - idx;
+  document.getElementById("st-count").textContent = left === 1 ? "última" : `${left} por ver`;
   document.getElementById("st-bar-fill").style.width = (100 * idx / queue.length) + "%";
 
   const meta = document.getElementById("sc-meta");
@@ -186,14 +212,17 @@ function grade(ok) {
   const c = queue[idx];
   const today = todayStr();
   const s = cardState(c);
+  if (!s) countNewIntro();            // primera vez que se estudia esta tarjeta
+  touchStreak();
   if (ok) {
     const b = Math.min((s ? s.b : 0) + 1, 4);
     state.p[c.id] = { b, due: addDays(today, BOX_DAYS[b]) };
     okCount++;
   } else {
-    state.p[c.id] = { b: 1, due: today };
+    // lapso suave: baja dos cajas en vez de volver a cero (una dominada olvidada no borra todo el avance)
+    state.p[c.id] = { b: Math.max(1, (s ? s.b : 1) - 2), due: today };
     failCount++;
-    if (!requeued.has(c.id)) {        // la falladas vuelven al final de la sesión, una vez
+    if (!requeued.has(c.id)) {        // las falladas vuelven al final de la sesión, una vez
       requeued.add(c.id);
       queue.push(c);
     }
@@ -214,13 +243,13 @@ function endSession() {
   const dom = CARDS.filter(isDominada).length;
   document.getElementById("sd-summary").textContent =
     `${okCount} bien · ${failCount} por reforzar — Llevan ${dom} de ${CARDS.length} dominadas.`;
-  refreshTop(); buildChips(); buildBrowse();
+  refreshTop(); buildChips(); refreshBrowse();
 }
 
 function closeSession() {
   overlay.classList.add("hidden");
   document.body.style.overflow = "";
-  refreshTop(); buildChips(); buildBrowse();
+  refreshTop(); buildChips(); refreshBrowse();
 }
 document.getElementById("st-close").addEventListener("click", closeSession);
 document.getElementById("btn-exit").addEventListener("click", closeSession);
@@ -238,56 +267,79 @@ function buildBrowse() {
   const wrap = document.getElementById("browse");
   wrap.innerHTML = "";
   for (const d of DECKS) {
-    const pool = CARDS.filter(c => c.deck === d.id);
     const det = document.createElement("details");
     det.className = "browse-deck";
+    det.dataset.deck = d.id;
     const sum = document.createElement("summary");
     sum.innerHTML = `<span></span><small></small>`;
     sum.querySelector("span").textContent = `${d.icon} ${d.name}`;
-    sum.querySelector("small").textContent = `${pool.filter(isDominada).length}/${pool.length}`;
     det.appendChild(sum);
-
-    const list = document.createElement("div");
-    list.className = "browse-list";
-    for (const c of pool) {
-      const item = document.createElement("details");
-      item.className = "browse-card";
-      const s = document.createElement("summary");
-      const dot = document.createElement("i");
-      dot.className = `st-dot ${stateDotCls(c)}`;
-      s.appendChild(dot);
-      s.appendChild(document.createTextNode((c.crit ? "🔴 " : "") + c.q));
-      item.appendChild(s);
-      const body = document.createElement("div");
-      body.className = "browse-answer";
-      for (const para of c.a.split("\n\n")) {
-        const p = document.createElement("p");
-        p.textContent = para;
-        body.appendChild(p);
+    // el contenido se arma recién cuando se abre el mazo (219 tarjetas pesan en celulares modestos)
+    det.addEventListener("toggle", () => {
+      if (det.open && !det.dataset.filled) {
+        det.dataset.filled = "1";
+        det.appendChild(buildBrowseList(d.id));
       }
-      if (c.idea) {
-        const box = document.createElement("div");
-        box.className = "sc-idea";
-        const t = document.createElement("strong");
-        t.textContent = "💡 ";
-        box.appendChild(t);
-        box.appendChild(document.createTextNode(c.idea));
-        body.appendChild(box);
-      }
-      item.appendChild(body);
-      list.appendChild(item);
-    }
-    det.appendChild(list);
+    });
     wrap.appendChild(det);
   }
+  refreshBrowse();
+}
+
+function buildBrowseList(deckId) {
+  const list = document.createElement("div");
+  list.className = "browse-list";
+  for (const c of CARDS.filter(x => x.deck === deckId)) {
+    const item = document.createElement("details");
+    item.className = "browse-card";
+    item.dataset.card = c.id;
+    const s = document.createElement("summary");
+    const dot = document.createElement("i");
+    dot.className = `st-dot ${stateDotCls(c)}`;
+    s.appendChild(dot);
+    s.appendChild(document.createTextNode((c.crit ? "🔴 " : "") + c.q));
+    item.appendChild(s);
+    const body = document.createElement("div");
+    body.className = "browse-answer";
+    for (const para of c.a.split("\n\n")) {
+      const p = document.createElement("p");
+      p.textContent = para;
+      body.appendChild(p);
+    }
+    if (c.idea) {
+      const box = document.createElement("div");
+      box.className = "sc-idea";
+      const t = document.createElement("strong");
+      t.textContent = "💡 ";
+      box.appendChild(t);
+      box.appendChild(document.createTextNode(c.idea));
+      body.appendChild(box);
+    }
+    item.appendChild(body);
+    list.appendChild(item);
+  }
+  return list;
+}
+
+function refreshBrowse() {
+  document.querySelectorAll(".browse-deck").forEach(det => {
+    const pool = CARDS.filter(c => c.deck === det.dataset.deck);
+    det.querySelector("summary small").textContent = `${pool.filter(isDominada).length}/${pool.length}`;
+  });
+  document.querySelectorAll(".browse-card").forEach(el => {
+    const c = CARDS.find(x => x.id === el.dataset.card);
+    if (c) el.querySelector(".st-dot").className = `st-dot ${stateDotCls(c)}`;
+  });
 }
 
 /* ---------- Reset ---------- */
 document.getElementById("btn-reset-cards").addEventListener("click", () => {
   if (confirm("¿Reiniciar tu progreso de tarjetas en este dispositivo? Los avances del plan no se tocan.")) {
     state.p = {};
+    state.intro = null;
+    state.streak = null;
     save();
-    refreshTop(); buildChips(); buildBrowse();
+    refreshTop(); buildChips(); refreshBrowse();
   }
 });
 
