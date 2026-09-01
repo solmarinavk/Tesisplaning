@@ -407,3 +407,10 @@ button.day:active { filter: brightness(.92); }
 .cheat-table tr:last-child td { border-bottom: none; }
 .cheat-note { font-size: .78rem; color: var(--ink-soft); font-style: italic; }
 .sc-full-label { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); margin-top: 2px; }
+
+/* estado del trámite en la UPC */
+.tramite {
+  border-left: 4px solid var(--indigo); background: #eef2ff;
+  border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; font-size: .9rem;
+}
+.tramite-note { color: var(--ink-soft); font-size: .82rem; }

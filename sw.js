@@ -1,5 +1,5 @@
 /* Service worker — Plan de Tesis G7 */
-const CACHE = "tesis-plan-g7-v5";
+const CACHE = "tesis-plan-g7-v6";
 const ASSETS = [
   "./",
   "./index.html",

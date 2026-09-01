@@ -164,10 +164,23 @@ const BLOCKS = [
   },
 ];
 
-// Avances con los que arranca la app la primera vez
+// Avances que la app trae de fábrica (id estable: se agregan una sola vez)
 const SEED_AVANCES = [
-  { d: "2026-08-24", t: "Le compartimos el documento al asesor" },
-  { d: "2026-08-28", t: "Turnitin respondió: todo bien 🎉" },
+  { id: "seed0", d: "2026-08-24", t: "Le compartimos el documento al asesor" },
+  { id: "seed1", d: "2026-08-28", t: "Turnitin respondió: todo bien 🎉" },
+  { id: "seed2", d: "2026-09-01", t: "UPC confirmó la recepción y envió el trabajo a dirección académica para nombrar a los jurados 🎉" },
+];
+
+// Trámite en la UPC tras la entrega (fechas estimadas según el correo del 1 de setiembre)
+const TRAMITE = [
+  { until: "2026-09-15", t: "Nombramiento de los 3 jurados",
+    d: "Dirección académica los designa y ellos confirman disponibilidad. Toma unas 2 semanas." },
+  { until: "2026-09-30", t: "Los jurados revisan el documento",
+    d: "15 días calendario desde que se les envía, con posible extensión de 7 días más." },
+  { until: "2026-10-31", t: "Levantar observaciones (si las hay)",
+    d: "Los jurados envían conformidad u observaciones. Son anónimos hasta el día de la sustentación." },
+  { until: "2026-11-30", t: "Sustentación",
+    d: "2ª o 3ª semana de noviembre, según el cronograma del programa." },
 ];
 
 /* ---------- Estado guardado ---------- */
@@ -179,8 +192,21 @@ try {
   if (raw) state = Object.assign(state, JSON.parse(raw));
 } catch (e) { /* storage bloqueado: la app igual funciona */ }
 
-if (!Array.isArray(state.avances)) {
-  state.avances = SEED_AVANCES.map((a, i) => ({ id: "seed" + i, d: a.d, t: a.t }));
+const primeraVez = !Array.isArray(state.avances);
+if (primeraVez) state.avances = [];
+if (!Array.isArray(state.seeded)) {
+  // quien ya usaba la app tenía las dos primeras semillas: no volver a agregarlas
+  state.seeded = primeraVez ? [] : ["seed0", "seed1"];
+}
+applySeeds();
+
+function applySeeds() {
+  for (const s of SEED_AVANCES) {
+    if (!state.seeded.includes(s.id)) {
+      state.avances.push({ id: s.id, d: s.d, t: s.t });
+      state.seeded.push(s.id);
+    }
+  }
 }
 
 function save() {
@@ -210,6 +236,22 @@ function buildHero() {
   const done = BLOCKS.filter(b => state.blocks[b.n]).length;
   wrap.appendChild(pill(done === BLOCKS.length ? "pill-done" : "pill-count",
     `${done}/6`, done === BLOCKS.length ? "¡Los 6 bloques expuestos! 🏆" : "bloques expuestos"));
+
+  buildTramite();
+}
+
+function buildTramite() {
+  const box = document.getElementById("tramite");
+  const etapa = TRAMITE.find(e => todayStr() <= e.until);
+  if (!etapa) { box.classList.add("hidden"); return; }
+  box.classList.remove("hidden");
+  box.innerHTML = "";
+  const t = document.createElement("strong");
+  t.textContent = "📬 Ahora: " + etapa.t;
+  const d = document.createElement("span");
+  d.className = "tramite-note";
+  d.textContent = etapa.d;
+  box.append(t, d);
 }
 
 function pill(cls, num, lbl) {
@@ -485,7 +527,8 @@ installBtn.addEventListener("click", async () => {
 
 document.getElementById("btn-reset").addEventListener("click", () => {
   if (confirm("¿Borrar los avances registrados y las marcas de los bloques en este dispositivo?")) {
-    state = { avances: [], blocks: {} };
+    state = { avances: [], blocks: {}, seeded: [] };
+    applySeeds();
     save();
     renderAll();
   }
